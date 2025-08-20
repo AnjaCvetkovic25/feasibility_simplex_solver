@@ -4,43 +4,44 @@
 #include <iostream>
 #include <fstream>
 
-
-using namespace std;
-
-int main()
+int main(int argc, char* argv[])
 {
-    int num_vars;
-    int num_constraints;
+    if(argc < 2) {
+        std::cerr << "Missing input file!" << std::endl;
+        return 1;
+    }
 
-    vector<Constraint> constraints;
+    std::string file_path = argv[1];
 
-    ifstream input_file("constraints.txt");
+    if (file_path.size() < 3 || file_path.substr(file_path.size() - 3) != ".fs") {
+        std::cerr << "Error: Input file must have .fs extension\n";
+        return 1;
+    }
+
+    std::ifstream input_file(file_path);
 
     if(!input_file.is_open()) {
-        cerr << "Failed to open input file\n";
+        std::cerr << "Failed to open input file!" << std::endl;
         return 1;
     }
+
+    int num_vars;
+    int num_constraints;
+    std::vector<Constraint> constraints;
+
     if(!LoadConstraintsFromStream(input_file, num_vars, num_constraints, constraints)) {
-        cerr << "Failed to parse input\n";
+        std::cerr << "Failed to parse input!" << std::endl;
         return 1;
     }
 
-    auto prepared_system = PrepareConstraints(constraints, num_vars);
-   // SimplexSolver solver(num_vars, constraints.size());
-    // solver.AddConstraint(2, {0, -1}, 0); // y >= 0
-    // solver.AddConstraint(0, {1, 1}, 5); // x + y <= 5
-    // solver.AddConstraint(1, {-1, 0}, 0); // x >= 0
-    SimplexSolver solver(prepared_system);
-    // for(int i = 0; i < num_constraints; ++i) {
-    //     solver.AddConstraint(i, constraints[i].coeffs, constraints[i].rhs);
-    // }
+    SimplexSolver solver(num_vars, num_constraints);
+    solver.AddConstraints(constraints);
 
-    if(solver.Solve()) {
-        solver.PrintSolution();
-        cout << "SAT";
+    if(solver.SolveFeasibility()) {
+        std::cout << "SAT";
     }
     else {
-        cout << "UNSAT";
+        std::cout << "UNSAT";
     }
     return 0;
 }

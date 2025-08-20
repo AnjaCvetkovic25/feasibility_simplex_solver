@@ -1,32 +1,36 @@
-#ifndef SIMPLEX_SOLVER_H
-#define SIMPLEX_SOLVER_H
+#pragma once
 #include "constraint_parser.h"
 #include <vector>
-
-using namespace std;
 
 class SimplexSolver
 {
 public:
-    SimplexSolver(const PreparedSystem& system);
     SimplexSolver(int num_vars, int num_constraints);
 
-    void AddConstraint(int row,const vector<double>& coeffs, double rhs);
+    void AddConstraints(const std::vector<Constraint>& constraints);
 
-    bool Solve();
-
-    void PrintSolution();
+    bool SolveFeasibility();
 
 private:
+    void AddConstraint(int row, const Constraint& constraint, std::vector<double>& rhs_values);
+
     int ChooseEnteringVariable() const;
 
     int ChooseLeavingVariable(int pivot_col) const;
 
     void Pivot(int pivot_row, int pivot_col);
 
+    void PrepareSystem();
+
+    void PrepareConstraint(Constraint& constraint) const;
+
+    int AddColumn();
+
+    void PrintTableau();
+
 private:
-    int num_vars_, num_constraints_;
-    vector<vector<double>> tableau_;
+    int num_vars_, num_constraints_, next_col_;
+    std::vector<vector<double>> tableau_;
+    std::vector<int> artificial_indices_;
 };
 
-#endif // SIMPLEX_SOLVER_H

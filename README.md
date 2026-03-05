@@ -14,9 +14,9 @@ cmake --build <build_dir>
 ```
 ---
 
-##Pokretanje
+## Pokretanje
 
 ```bash
-./<build_dir>/feasibility_simplex_solver <input_file_path>.txt
+./<build_dir>/feasibility_simplex_solver <input_file_path>.fs
 ```
 
